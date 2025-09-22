@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dream Care Bingo</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Caveat', cursive;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            font-size: 3rem;
+            color: #7ba05b;
+            text-align: center;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .date-input {
+            border: none;
+            background: transparent;
+            font-family: 'Caveat', cursive;
+            font-size: 1.5rem;
+            color: #666;
+            cursor: pointer;
+            padding: 5px;
+            border-bottom: 2px dashed #7ba05b;
+            margin: 0 5px;
+        }
+
+        .date-input:focus {
+            outline: none;
+            border-bottom: 2px solid #7ba05b;
+            background: rgba(123, 160, 91, 0.1);
+        }
+
+        .setup-screen {
+            display: block;
+        }
+
+        .game-screen {
+            display: none;
+        }
+
+        .review-screen {
+            display: none;
+        }
+
+        .bingo-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .bingo-cell {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: #a8c686;
+            border: none;
+            font-family: 'Caveat', cursive;
+            font-size: 16px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 10px;
+            resize: none;
+            outline: none;
+        }
+
+        .bingo-cell:focus {
+            background: #7ba05b;
+            box-shadow: 0 0 15px rgba(123, 160, 91, 0.5);
+        }
+
+        .bingo-cell::placeholder {
+            color: rgba(255,255,255,0.8);
+            font-size: 14px;
+        }
+
+        .game-cell {
+            background: #a8c686;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-cell.completed {
+            background: #6a8f50;
+        }
+
+        .game-cell.completed::after {
+            content: "✓";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            color: white;
+            font-weight: bold;
+        }
+
+        .motivational-text {
+            font-size: 1.8rem;
+            color: #7ba05b;
+            margin: 10px 0;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .rewards-section, .review-section {
+            border: 2px dashed #7ba05b;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+
+        .rewards-title, .review-title {
+            font-size: 2rem;
+            color: #7ba05b;
+            margin-bottom: 15px;
+        }
+
+        .reward-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #a8c686;
+            border-radius: 10px;
+            font-family: 'Caveat', cursive;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .start-btn, .complete-btn, .save-image-btn {
+            background: #7ba05b;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            font-family: 'Caveat', cursive;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 20px auto;
+        }
+
+        .start-btn:hover, .complete-btn:hover, .save-image-btn:hover {
+            background: #6a8f50;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .save-image-btn {
+            background: #9b59b6;
+            margin: 10px auto;
+        }
+
+        .save-image-btn:hover {
+            background: #8e44ad;
+        }
+
+        .button-group {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .start-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            opacity: 0.5;
+        }
+
+        .celebration {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #7ba05b, #a8c686);
+            border-radius: 20px;
+            margin: 20px 0;
+            color: white;
+        }
+
+        .celebration h2 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .motivational-quote {
+            font-size: 1.5rem;
+            font-style: italic;
+            margin: 15px 0;
+        }
+
+        /* SMART Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-title {
+            font-size: 2.5rem;
+            color: #7ba05b;
+            margin-bottom: 10px;
+        }
+
+        .modal-subtitle {
+            font-size: 1.3rem;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .smart-checklist {
+            margin: 20px 0;
+        }
+
+        .smart-item {
+            display: flex;
+            align-items: flex-start;
+            margin: 15px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #7ba05b;
+        }
+
+        .smart-checkbox {
+            margin-right: 15px;
+            margin-top: 5px;
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+
+        .smart-label {
+            flex: 1;
+            font-size: 1.1rem;
+            color: #333;
+            line-height: 1.4;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        .smart-label:hover {
+            background: rgba(123, 160, 91, 0.1);
+        }
+
+        .clickable-hint {
+            font-size: 0.8rem;
+            color: #999;
+            font-style: italic;
+            margin-top: 5px;
+        }
+
+        .smart-letter {
+            font-weight: bold;
+            color: #7ba05b;
+            font-size: 1.2rem;
+        }
+
+        .modal-buttons {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        .modal-btn {
+            background: #7ba05b;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1.2rem;
+            font-family: 'Caveat', cursive;
+            border-radius: 20px;
+            cursor: pointer;
+            margin: 5px 10px;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn:hover {
+            background: #6a8f50;
+            transform: translateY(-2px);
+        }
+
+        .modal-btn.secondary {
+            background: #95a5a6;
+        }
+
+        .modal-btn.secondary:hover {
+            background: #7f8c8d;
+        }
+
+        .modal-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #7ba05b, #a8c686);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 5px;
+        }
+
+        /* Animations */
+        @keyframes bingo {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes superBingo {
+            0% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.2) rotate(5deg); }
+            50% { transform: scale(1.1) rotate(-5deg); }
+            75% { transform: scale(1.2) rotate(5deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+
+        .bingo-animation {
+            animation: bingo 1s ease-in-out 3;
+        }
+
+        .super-bingo-animation {
+            animation: superBingo 2s ease-in-out 3;
+        }
+
+        .grid-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Setup Screen -->
+        <div class="setup-screen" id="setupScreen">
+            <h1>Dream Care Bingo</h1>
+            <div class="subtitle">
+                from 
+                <input type="date" id="startDate" class="date-input"> 
+                to 
+                <input type="date" id="endDate" class="date-input">
+            </div>
+            
+            <div class="motivational-text" onclick="toggleMotivationalText(this)" data-en="You can do anything better than you think" data-ja="あなたは思っている以上に何でもできる">You can do anything better than you think</div>
+            
+            <div class="grid-container">
+                <div class="bingo-grid" id="setupGrid">
+                    <textarea class="bingo-cell" placeholder="Enter your task..." maxlength="50"></textarea>
+                    <textarea class="bingo-cell" placeholder="Enter your task..." maxlength="50"></textarea>
+                    <textarea class="bingo-cell" placeholder="Enter your task..." maxlength="50"></textarea>
+                    <textarea class="bingo-cell" placeholder="Enter your task..." maxlength="50"></textarea>
+                    <textarea class="bingo-cell" placeholder="Enter your task..." maxlength="50"></textarea>
+                    <textarea class="bingo-cell" placeholder="Enter your task..." maxlength="50"></textarea>
+                    <textarea class="bingo-cell" placeholder="Enter your task..." maxlength="50"></textarea>
+                    <textarea class="bingo-cell" placeholder="Enter your task..." maxlength="50"></textarea>
+                    <textarea class="bingo-cell" placeholder="Enter your task..." maxlength="50"></textarea>
+                </div>
+            </div>
+            
+            <div class="motivational-text" onclick="toggleMotivationalText(this)" data-en="Your future self will thank you for not giving up" data-ja="諦めなかった今のあなたを、未来の自分が感謝するでしょう">Your future self will thank you for not giving up</div>
+            
+            <div class="rewards-section">
+                <div class="rewards-title">Rewards</div>
+                <input type="text" class="reward-input" id="reward1" placeholder="1 bingo">
+                <input type="text" class="reward-input" id="reward3" placeholder="3 bingo">
+                <input type="text" class="reward-input" id="reward5" placeholder="5 bingo">
+                <input type="text" class="reward-input" id="rewardComplete" placeholder="Complete">
+            </div>
+            
+            <div class="button-group">
+                <button class="save-image-btn" id="saveImageBtn">Save as Image</button>
+                <button class="start-btn" id="startBtn" disabled>Start</button>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div class="game-screen" id="gameScreen">
+            <h1>Dream Care Bingo</h1>
+            <div class="subtitle">Click completed tasks!</div>
+            
+            <div class="grid-container">
+                <div class="bingo-grid" id="gameGrid">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+            
+            <div id="celebrationArea"></div>
+            
+            <div class="button-group">
+                <button class="save-image-btn" id="saveImageBtn2">Save as Image</button>
+                <button class="complete-btn" id="completeBtn">Complete This Week</button>
+            </div>
+        </div>
+
+        <!-- Review Screen -->
+        <div class="review-screen" id="reviewScreen">
+            <h1>Weekly Review</h1>
+            <div class="celebration">
+                <h2>🎉 Great Job! 🎉</h2>
+                <div class="motivational-quote" onclick="toggleMotivationalText(this)" data-en="Progress, not perfection, is what matters" data-ja="完璧ではなく、進歩こそが大切です">"Progress, not perfection, is what matters"</div>
+            </div>
+            
+            <div class="review-section">
+                <div class="review-title">Review for this week</div>
+                <textarea class="reward-input" id="weeklyReview" placeholder="How was your week? What did you learn?" style="height: 100px; resize: vertical;"></textarea>
+            </div>
+            
+            <div class="button-group">
+                <button class="save-image-btn" id="saveImageBtn3">Save as Image</button>
+                <button class="start-btn" onclick="resetApp()">Start New Week</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SMART Goal Check Modal -->
+    <div id="smartModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">🎯 SMART Goal Check</div>
+                <div class="modal-subtitle">Let's make sure your goals are set up for success!</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+            
+            <div class="smart-checklist">
+                <div class="smart-item">
+                    <input type="checkbox" class="smart-checkbox" id="specific">
+                    <div class="smart-content">
+                        <label for="specific" class="smart-label-checkbox">
+                            <span class="smart-letter">S</span>pecific
+                        </label>
+                        <div class="smart-text-content" onclick="toggleSmartText(this)" data-en="Are your tasks clear and specific?" data-ja="タスクは明確で具体的ですか？" data-example-en="Instead of &quot;exercise more&quot; → &quot;walk for 30 minutes&quot;" data-example-ja="「もっと運動する」→「30分歩く」のように具体的に">
+                            <div class="smart-main-text">Are your tasks clear and specific?</div>
+                            <small class="smart-example">Instead of "exercise more" → "walk for 30 minutes"</small>
+                            <div class="clickable-hint">👆 Tap to see Japanese translation</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="smart-item">
+                    <input type="checkbox" class="smart-checkbox" id="measurable">
+                    <div class="smart-content">
+                        <label for="measurable" class="smart-label-checkbox">
+                            <span class="smart-letter">M</span>easurable
+                        </label>
+                        <div class="smart-text-content" onclick="toggleSmartText(this)" data-en="Can you clearly tell if it's done?" data-ja="完了したかどうか明確に判断できますか？" data-example-en="Instead of &quot;study hard&quot; → &quot;study math for 1 hour&quot;" data-example-ja="「がんばって勉強」→「数学を1時間勉強」のように測定可能に">
+                            <div class="smart-main-text">Can you clearly tell if it's done?</div>
+                            <small class="smart-example">Instead of "study hard" → "study math for 1 hour"</small>
+                            <div class="clickable-hint">👆 Tap to see Japanese translation</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="smart-item">
+                    <input type="checkbox" class="smart-checkbox" id="achievable">
+                    <div class="smart-content">
+                        <label for="achievable" class="smart-label-checkbox">
+                            <span class="smart-letter">A</span>chievable
+                        </label>
+                        <div class="smart-text-content" onclick="toggleSmartText(this)" data-en="Are these realistic for you right now?" data-ja="今の自分にとって現実的ですか？" data-example-en="Challenge yourself, but don't set impossible tasks" data-example-ja="チャレンジングでも、不可能でないタスクに設定しましょう">
+                            <div class="smart-main-text">Are these realistic for you right now?</div>
+                            <small class="smart-example">Challenge yourself, but don't set impossible tasks</small>
+                            <div class="clickable-hint">👆 Tap to see Japanese translation</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="smart-item">
+                    <input type="checkbox" class="smart-checkbox" id="relevant">
+                    <div class="smart-content">
+                        <label for="relevant" class="smart-label-checkbox">
+                            <span class="smart-letter">R</span>elevant
+                        </label>
+                        <div class="smart-text-content" onclick="toggleSmartText(this)" data-en="Do these tasks matter to your bigger goals?" data-ja="これらのタスクはあなたの大きな目標につながりますか？" data-example-en="Make sure each task moves you forward" data-example-ja="各タスクが前進につながることを確認しましょう">
+                            <div class="smart-main-text">Do these tasks matter to your bigger goals?</div>
+                            <small class="smart-example">Make sure each task moves you forward</small>
+                            <div class="clickable-hint">👆 Tap to see Japanese translation</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="smart-item">
+                    <input type="checkbox" class="smart-checkbox" id="timebound">
+                    <div class="smart-content">
+                        <label for="timebound" class="smart-label-checkbox">
+                            <span class="smart-letter">T</span>ime-bound
+                        </label>
+                        <div class="smart-text-content" onclick="toggleSmartText(this)" data-en="Did you set clear dates?" data-ja="明確な日付を設定しましたか？" data-example-en="You chose your timeline above - that's perfect!" data-example-ja="上で期間を選択しましたね - それで完璧です！">
+                            <div class="smart-main-text">Did you set clear dates?</div>
+                            <small class="smart-example">You chose your timeline above - that's perfect!</small>
+                            <div class="clickable-hint">👆 Tap to see Japanese translation</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-buttons">
+                <button class="modal-btn secondary" onclick="goBackToEdit()">Go Back & Edit</button>
+                <button class="modal-btn" id="proceedBtn" disabled>Let's Start! 🚀</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let tasks = [];
+        let rewards = {};
+        let completedCells = [];
+        let bingoCount = 0;
+
+        // Motivational quotes with Japanese translations
+        const motivationalQuotes = [
+            {
+                en: "You're stronger than you think and more capable than you imagine!",
+                ja: "あなたは思っている以上に強く、想像以上に有能です！"
+            },
+            {
+                en: "Every small step forward is progress worth celebrating!",
+                ja: "小さな一歩も、祝うべき進歩です！"
+            },
+            {
+                en: "Your future self will thank you for not giving up!",
+                ja: "諦めなかった今のあなたを、未来の自分が感謝するでしょう！"
+            },
+            {
+                en: "Believe in yourself and all that you are!",
+                ja: "自分自身と、あなたの全てを信じてください！"
+            },
+            {
+                en: "You have the power to create the life you want!",
+                ja: "あなたには、望む人生を創造する力があります！"
+            },
+            {
+                en: "Your dreams are valid and achievable!",
+                ja: "あなたの夢は価値があり、実現可能です！"
+            },
+            {
+                en: "Every day is a new opportunity to grow!",
+                ja: "毎日が成長する新しい機会です！"
+            },
+            {
+                en: "You are exactly where you need to be right now!",
+                ja: "あなたは今、まさにいるべき場所にいます！"
+            }
+        ];
+
+        // Initialize app when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded, initializing app...');
+            loadSavedData();
+            checkStartButtonState();
+            setupEventListeners();
+            setupSmartGoalCheck();
+        });
+
+        // Set up all event listeners
+        function setupEventListeners() {
+            console.log('Setting up event listeners...');
+            
+            // Task input cells
+            const cells = document.querySelectorAll('#setupGrid .bingo-cell');
+            cells.forEach(cell => {
+                cell.addEventListener('input', function() {
+                    checkStartButtonState();
+                    saveData();
+                });
+            });
+
+            // Reward inputs
+            const rewardInputs = document.querySelectorAll('.reward-input');
+            rewardInputs.forEach(input => {
+                input.addEventListener('input', saveData);
+            });
+
+            // Date inputs
+            const dateInputs = document.querySelectorAll('.date-input');
+            dateInputs.forEach(input => {
+                input.addEventListener('change', saveData);
+            });
+
+            // Start button
+            const startBtn = document.getElementById('startBtn');
+            startBtn.addEventListener('click', function() {
+                console.log('Start button clicked');
+                startGame();
+            });
+            
+            // Save image buttons
+            document.getElementById('saveImageBtn').addEventListener('click', () => saveAsImage('setupScreen'));
+            document.getElementById('saveImageBtn2').addEventListener('click', () => saveAsImage('gameScreen'));
+            document.getElementById('saveImageBtn3').addEventListener('click', () => saveAsImage('reviewScreen'));
+            
+            // Complete button
+            document.getElementById('completeBtn').addEventListener('click', showReview);
+            
+            // SMART modal proceed button
+            document.getElementById('proceedBtn').addEventListener('click', proceedToGame);
+        }
+
+        // Check if start button should be enabled
+        function checkStartButtonState() {
+            const cells = document.querySelectorAll('#setupGrid .bingo-cell');
+            const allFilled = Array.from(cells).every(cell => cell.value.trim() !== '');
+            const startBtn = document.getElementById('startBtn');
+            
+            startBtn.disabled = !allFilled;
+            startBtn.style.opacity = allFilled ? '1' : '0.5';
+        }
+
+        // Start the game (show SMART goal check)
+        function startGame() {
+            console.log('Starting game, showing SMART modal...');
+            document.getElementById('smartModal').style.display = 'block';
+            
+            // Reset checkboxes
+            const checkboxes = document.querySelectorAll('.smart-checkbox');
+            checkboxes.forEach(cb => cb.checked = false);
+            updateSmartProgress();
+        }
+
+        // Set up SMART goal checkboxes
+        function setupSmartGoalCheck() {
+            const checkboxes = document.querySelectorAll('.smart-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', updateSmartProgress);
+            });
+        }
+
+        // Update SMART progress bar
+        function updateSmartProgress() {
+            const checkboxes = document.querySelectorAll('.smart-checkbox');
+            const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+            const progress = (checkedCount / checkboxes.length) * 100;
+            
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('proceedBtn').disabled = checkedCount < checkboxes.length;
+        }
+
+        // Go back to edit tasks
+        function goBackToEdit() {
+            document.getElementById('smartModal').style.display = 'none';
+        }
+
+        // Proceed to game after SMART check
+        function proceedToGame() {
+            console.log('Proceeding to game...');
+            document.getElementById('smartModal').style.display = 'none';
+            actuallyStartGame();
+        }
+
+        // Actually start the game
+        function actuallyStartGame() {
+            // Save tasks
+            const cells = document.querySelectorAll('#setupGrid .bingo-cell');
+            tasks = Array.from(cells).map(cell => cell.value.trim());
+            
+            // Save rewards
+            rewards = {
+                one: document.getElementById('reward1').value,
+                three: document.getElementById('reward3').value,
+                five: document.getElementById('reward5').value,
+                complete: document.getElementById('rewardComplete').value
+            };
+            
+            // Reset game state
+            completedCells = [];
+            bingoCount = 0;
+            
+            // Create game grid
+            createGameGrid();
+            
+            // Switch to game screen
+            document.getElementById('setupScreen').style.display = 'none';
+            document.getElementById('gameScreen').style.display = 'block';
+            
+            saveData();
+        }
+
+        // Create the game grid
+        function createGameGrid() {
+            const gameGrid = document.getElementById('gameGrid');
+            gameGrid.innerHTML = '';
+            
+            tasks.forEach((task, index) => {
+                const cell = document.createElement('div');
+                cell.className = 'bingo-cell game-cell';
+                cell.textContent = task;
+                cell.dataset.index = index;
+                
+                cell.addEventListener('click', function() {
+                    toggleCell(index);
+                });
+                
+                if (completedCells.includes(index)) {
+                    cell.classList.add('completed');
+                }
+                
+                gameGrid.appendChild(cell);
+            });
+        }
+
+        // Toggle cell completion
+        function toggleCell(index) {
+            const cell = document.querySelector(`[data-index="${index}"]`);
+            
+            if (completedCells.includes(index)) {
+                completedCells = completedCells.filter(i => i !== index);
+                cell.classList.remove('completed');
+            } else {
+                completedCells.push(index);
+                cell.classList.add('completed');
+                checkBingo();
+            }
+            
+            saveData();
+        }
+
+        // Check for bingo
+        function checkBingo() {
+            const lines = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], // horizontal
+                [0, 3, 6], [1, 4, 7], [2, 5, 8], // vertical
+                [0, 4, 8], [2, 4, 6]              // diagonal
+            ];
+            
+            let newBingoCount = 0;
+            lines.forEach(line => {
+                if (line.every(index => completedCells.includes(index))) {
+                    newBingoCount++;
+                }
+            });
+            
+            if (newBingoCount > bingoCount) {
+                bingoCount = newBingoCount;
+                celebrateBingo();
+            }
+            
+            if (completedCells.length === 9) {
+                celebrateSuperBingo();
+            }
+        }
+
+        // Celebrate bingo
+        function celebrateBingo() {
+            const gameGrid = document.getElementById('gameGrid');
+            gameGrid.classList.add('bingo-animation');
+            
+            setTimeout(() => {
+                gameGrid.classList.remove('bingo-animation');
+            }, 3000);
+            
+            showCelebration(`🎉 BINGO! ${bingoCount} line${bingoCount > 1 ? 's' : ''} completed! 🎉`);
+        }
+
+        // Celebrate super bingo
+        function celebrateSuperBingo() {
+            const gameGrid = document.getElementById('gameGrid');
+            gameGrid.classList.add('super-bingo-animation');
+            
+            setTimeout(() => {
+                gameGrid.classList.remove('super-bingo-animation');
+            }, 6000);
+            
+            showCelebration("🌟 SUPER BINGO! ALL TASKS COMPLETED! 🌟", true);
+        }
+
+        // Toggle motivational text between English and Japanese
+        function toggleMotivationalText(element) {
+            const isEnglish = element.getAttribute('data-current') !== 'ja';
+            const enText = element.getAttribute('data-en');
+            const jaText = element.getAttribute('data-ja');
+            
+            if (isEnglish) {
+                element.textContent = jaText;
+                element.setAttribute('data-current', 'ja');
+            } else {
+                element.textContent = enText;
+                element.setAttribute('data-current', 'en');
+            }
+        }
+
+        // Toggle SMART text between English and Japanese
+        function toggleSmartText(element) {
+            const smartLetter = element.parentElement.querySelector('.smart-letter').textContent;
+            const isEnglish = element.getAttribute('data-current') !== 'ja';
+            
+            const enText = element.getAttribute('data-en');
+            const jaText = element.getAttribute('data-ja');
+            const enExample = element.getAttribute('data-example-en');
+            const jaExample = element.getAttribute('data-example-ja');
+            
+            if (isEnglish) {
+                element.innerHTML = `
+                    <div class="smart-main-text">${jaText}</div>
+                    <small class="smart-example">${jaExample}</small>
+                    <div class="clickable-hint">👆 Tap to see English version</div>
+                `;
+                element.setAttribute('data-current', 'ja');
+            } else {
+                element.innerHTML = `
+                    <div class="smart-main-text">${enText}</div>
+                    <small class="smart-example">${enExample}</small>
+                    <div class="clickable-hint">👆 Tap to see Japanese translation</div>
+                `;
+                element.setAttribute('data-current', 'en');
+            }
+        }
+
+        // Show celebration message
+        function showCelebration(message, isSuper = false) {
+            const celebrationArea = document.getElementById('celebrationArea');
+            const randomQuote = motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
+            
+            celebrationArea.innerHTML = `
+                <div class="celebration">
+                    <h2>${message}</h2>
+                    <div class="motivational-quote" onclick="toggleMotivationalText(this)" data-en="${randomQuote.en}" data-ja="${randomQuote.ja}">"${randomQuote.en}"</div>
+                    ${isSuper ? '<div style="font-size: 1.2rem; margin-top: 10px;">You are absolutely amazing! 🌟</div>' : ''}
+                </div>
+            `;
+            
+            setTimeout(() => {
+                celebrationArea.innerHTML = '';
+            }, 5000);
+        }
+
+        // Show review screen
+        function showReview() {
+            document.getElementById('gameScreen').style.display = 'none';
+            document.getElementById('reviewScreen').style.display = 'block';
+        }
+
+        // Save as image
+        function saveAsImage(screenId) {
+            const screen = document.getElementById(screenId);
+            const saveButtons = document.querySelectorAll('.save-image-btn');
+            
+            saveButtons.forEach(btn => btn.style.display = 'none');
+            
+            const fileNames = {
+                'setupScreen': 'dream-care-bingo-setup.png',
+                'gameScreen': 'dream-care-bingo-progress.png',
+                'reviewScreen': 'dream-care-bingo-review.png'
+            };
+            
+            html2canvas(screen, {
+                backgroundColor: '#ffffff',
+                scale: 2,
+                useCORS: true
+            }).then(function(canvas) {
+                saveButtons.forEach(btn => btn.style.display = 'block');
+                
+                const link = document.createElement('a');
+                link.download = fileNames[screenId];
+                link.href = canvas.toDataURL('image/png');
+                
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showTemporaryMessage('📸 Image saved successfully!');
+            }).catch(function(error) {
+                saveButtons.forEach(btn => btn.style.display = 'block');
+                console.error('Error saving image:', error);
+                showTemporaryMessage('❌ Failed to save image. Please try again.');
+            });
+        }
+
+        // Show temporary message
+        function showTemporaryMessage(message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.textContent = message;
+            messageDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #7ba05b;
+                color: white;
+                padding: 15px 20px;
+                border-radius: 10px;
+                font-family: 'Caveat', cursive;
+                font-size: 1.2rem;
+                z-index: 1000;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            `;
+            
+            document.body.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                if (document.body.contains(messageDiv)) {
+                    document.body.removeChild(messageDiv);
+                }
+            }, 3000);
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            const data = {
+                startDate: document.getElementById('startDate').value,
+                endDate: document.getElementById('endDate').value,
+                tasks: Array.from(document.querySelectorAll('#setupGrid .bingo-cell')).map(cell => cell.value),
+                rewards: {
+                    one: document.getElementById('reward1')?.value || '',
+                    three: document.getElementById('reward3')?.value || '',
+                    five: document.getElementById('reward5')?.value || '',
+                    complete: document.getElementById('rewardComplete')?.value || ''
+                },
+                completedCells: completedCells,
+                bingoCount: bingoCount,
+                review: document.getElementById('weeklyReview')?.value || ''
+            };
+            
+            localStorage.setItem('dreamCareBingo', JSON.stringify(data));
+        }
+
+        // Load saved data
+        function loadSavedData() {
+            const savedData = localStorage.getItem('dreamCareBingo');
+            
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                
+                // Restore dates
+                if (data.startDate) {
+                    document.getElementById('startDate').value = data.startDate;
+                }
+                if (data.endDate) {
+                    document.getElementById('endDate').value = data.endDate;
+                }
+                
+                // Restore tasks
+                const cells = document.querySelectorAll('#setupGrid .bingo-cell');
+                cells.forEach((cell, index) => {
+                    if (data.tasks && data.tasks[index]) {
+                        cell.value = data.tasks[index];
+                    }
+                });
+                
+                // Restore rewards
+                if (data.rewards) {
+                    document.getElementById('reward1').value = data.rewards.one || '';
+                    document.getElementById('reward3').value = data.rewards.three || '';
+                    document.getElementById('reward5').value = data.rewards.five || '';
+                    document.getElementById('rewardComplete').value = data.rewards.complete || '';
+                }
+                
+                // Restore game state
+                completedCells = data.completedCells || [];
+                bingoCount = data.bingoCount || 0;
+                
+                // Restore review
+                const reviewTextarea = document.getElementById('weeklyReview');
+                if (reviewTextarea && data.review) {
+                    reviewTextarea.value = data.review;
+                }
+            }
+        }
+
+        // Reset app
+        function resetApp() {
+            localStorage.removeItem('dreamCareBingo');
+            location.reload();
+        }
+    </script>
+</body>
+</html>
