@@ -30,6 +30,19 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
 
+        /* レスポンシブ対応: スマホでパディング調整 */
+        @media (max-width: 768px) {
+            .container {
+                margin: 0 10px;
+                padding: 20px;
+                border-radius: 15px;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+        }
+
         h1 {
             font-size: 3rem;
             color: #7ba05b;
@@ -43,6 +56,33 @@
             color: #666;
             text-align: center;
             margin-bottom: 30px;
+        }
+
+        /* レスポンシブ対応: スマホで日付を2行表示 */
+        @media (max-width: 768px) {
+            .subtitle {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            .date-line {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+        }
+
+        /* PCでは通常通り横並び */
+        @media (min-width: 769px) {
+            .date-line {
+                display: inline;
+            }
+            
+            .date-line:first-child::after {
+                content: " ";
+            }
         }
 
         .date-input {
@@ -80,6 +120,7 @@
             grid-template-columns: repeat(3, 1fr);
             gap: 15px;
             margin: 30px 0;
+            justify-items: center;
         }
 
         .bingo-cell {
@@ -100,6 +141,30 @@
             padding: 10px;
             resize: none;
             outline: none;
+        }
+
+        /* レスポンシブ対応: スマホでビンゴセルを小さく */
+        @media (max-width: 768px) {
+            .bingo-grid {
+                gap: 10px;
+                margin: 20px 10px;
+            }
+            
+            .bingo-cell {
+                width: 90px;
+                height: 90px;
+                font-size: 13px;
+                padding: 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .bingo-cell {
+                width: 80px;
+                height: 80px;
+                font-size: 12px;
+                padding: 6px;
+            }
         }
 
         .bingo-cell:focus {
@@ -142,6 +207,15 @@
             margin: 10px 0;
             font-weight: 600;
             text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .motivational-text:hover {
+            background: rgba(123, 160, 91, 0.1);
+            transform: scale(1.02);
         }
 
         .rewards-section, .review-section {
@@ -226,6 +300,15 @@
             font-size: 1.5rem;
             font-style: italic;
             margin: 15px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .motivational-quote:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.02);
         }
 
         /* SMART Modal */
@@ -284,14 +367,21 @@
             border-left: 4px solid #7ba05b;
         }
 
-        .smart-checkbox {
-            margin-right: 15px;
-            margin-top: 5px;
-            transform: scale(1.2);
+        .smart-content {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .smart-label-checkbox {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #7ba05b;
+            margin-bottom: 8px;
             cursor: pointer;
         }
 
-        .smart-label {
+        .smart-text-content {
             flex: 1;
             font-size: 1.1rem;
             color: #333;
@@ -302,8 +392,30 @@
             border-radius: 5px;
         }
 
-        .smart-label:hover {
+        .smart-text-content:hover {
             background: rgba(123, 160, 91, 0.1);
+        }
+
+        .smart-main-text {
+            margin-bottom: 5px;
+        }
+
+        .smart-example {
+            display: block;
+            margin-top: 5px;
+        }
+
+        .smart-checkbox {
+            margin-right: 15px;
+            margin-top: 5px;
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+
+        .smart-letter {
+            font-weight: bold;
+            color: #7ba05b;
+            font-size: 1.2rem;
         }
 
         .clickable-hint {
@@ -311,12 +423,6 @@
             color: #999;
             font-style: italic;
             margin-top: 5px;
-        }
-
-        .smart-letter {
-            font-weight: bold;
-            color: #7ba05b;
-            font-size: 1.2rem;
         }
 
         .modal-buttons {
@@ -409,10 +515,12 @@
         <div class="setup-screen" id="setupScreen">
             <h1>Dream Care Bingo</h1>
             <div class="subtitle">
-                from 
-                <input type="date" id="startDate" class="date-input"> 
-                to 
-                <input type="date" id="endDate" class="date-input">
+                <div class="date-line">
+                    from <input type="date" id="startDate" class="date-input">
+                </div>
+                <div class="date-line">
+                    to <input type="date" id="endDate" class="date-input">
+                </div>
             </div>
             
             <div class="motivational-text" onclick="toggleMotivationalText(this)" data-en="You can do anything better than you think" data-ja="あなたは思っている以上に何でもできる">You can do anything better than you think</div>
@@ -628,6 +736,48 @@
             setupSmartGoalCheck();
         });
 
+        // Toggle motivational text between English and Japanese
+        function toggleMotivationalText(element) {
+            const isEnglish = element.getAttribute('data-current') !== 'ja';
+            const enText = element.getAttribute('data-en');
+            const jaText = element.getAttribute('data-ja');
+            
+            if (isEnglish) {
+                element.textContent = jaText;
+                element.setAttribute('data-current', 'ja');
+            } else {
+                element.textContent = enText;
+                element.setAttribute('data-current', 'en');
+            }
+        }
+
+        // Toggle SMART text between English and Japanese
+        function toggleSmartText(element) {
+            const smartLetter = element.parentElement.querySelector('.smart-letter').textContent;
+            const isEnglish = element.getAttribute('data-current') !== 'ja';
+            
+            const enText = element.getAttribute('data-en');
+            const jaText = element.getAttribute('data-ja');
+            const enExample = element.getAttribute('data-example-en');
+            const jaExample = element.getAttribute('data-example-ja');
+            
+            if (isEnglish) {
+                element.innerHTML = `
+                    <div class="smart-main-text">${jaText}</div>
+                    <small class="smart-example">${jaExample}</small>
+                    <div class="clickable-hint">👆 Tap to see English version</div>
+                `;
+                element.setAttribute('data-current', 'ja');
+            } else {
+                element.innerHTML = `
+                    <div class="smart-main-text">${enText}</div>
+                    <small class="smart-example">${enExample}</small>
+                    <div class="clickable-hint">👆 Tap to see Japanese translation</div>
+                `;
+                element.setAttribute('data-current', 'en');
+            }
+        }
+
         // Set up all event listeners
         function setupEventListeners() {
             console.log('Setting up event listeners...');
@@ -837,48 +987,6 @@
             }, 6000);
             
             showCelebration("🌟 SUPER BINGO! ALL TASKS COMPLETED! 🌟", true);
-        }
-
-        // Toggle motivational text between English and Japanese
-        function toggleMotivationalText(element) {
-            const isEnglish = element.getAttribute('data-current') !== 'ja';
-            const enText = element.getAttribute('data-en');
-            const jaText = element.getAttribute('data-ja');
-            
-            if (isEnglish) {
-                element.textContent = jaText;
-                element.setAttribute('data-current', 'ja');
-            } else {
-                element.textContent = enText;
-                element.setAttribute('data-current', 'en');
-            }
-        }
-
-        // Toggle SMART text between English and Japanese
-        function toggleSmartText(element) {
-            const smartLetter = element.parentElement.querySelector('.smart-letter').textContent;
-            const isEnglish = element.getAttribute('data-current') !== 'ja';
-            
-            const enText = element.getAttribute('data-en');
-            const jaText = element.getAttribute('data-ja');
-            const enExample = element.getAttribute('data-example-en');
-            const jaExample = element.getAttribute('data-example-ja');
-            
-            if (isEnglish) {
-                element.innerHTML = `
-                    <div class="smart-main-text">${jaText}</div>
-                    <small class="smart-example">${jaExample}</small>
-                    <div class="clickable-hint">👆 Tap to see English version</div>
-                `;
-                element.setAttribute('data-current', 'ja');
-            } else {
-                element.innerHTML = `
-                    <div class="smart-main-text">${enText}</div>
-                    <small class="smart-example">${enExample}</small>
-                    <div class="clickable-hint">👆 Tap to see Japanese translation</div>
-                `;
-                element.setAttribute('data-current', 'en');
-            }
         }
 
         // Show celebration message
